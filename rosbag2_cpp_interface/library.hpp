@@ -11,6 +11,7 @@ typedef struct
 typedef struct
 {
     const char *topic_name;
+    int64_t time_stamp;
     size_t topic_buffer_size;
     const uint8_t *topic_buffer;
 } Rosbag2Topic;
@@ -27,6 +28,7 @@ extern "C"
     const char *get_topic_name(Rosbag2CppReaderImpl *reader, size_t num);
     const char *get_topic_type(Rosbag2CppReaderImpl *reader, size_t num);
 
+    void seek_bag_reader(Rosbag2CppReaderImpl *reader, int64_t t);
     bool has_next_topic(Rosbag2CppReaderImpl *);
     Rosbag2Topic get_next_topic(Rosbag2CppReaderImpl *reader);
 

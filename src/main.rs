@@ -11,7 +11,7 @@ fn main() {
     let args = Args::parse();
 
     let reader = rosbag2_ffi_rs::Rosbag2Reader::new(args.filepath.as_str());
-    println!("{:?}", reader);
+    println!("{}", reader);
 
     println!(
         "{:?}",

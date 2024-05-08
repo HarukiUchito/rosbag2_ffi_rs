@@ -34,10 +34,15 @@ extern "C"
         return reader->metadata[num].type.c_str();
     }
 
+    void seek_bag_reader(Rosbag2CppReaderImpl *reader, int64_t t)
+    {
+        reader->impl.seek(t);
+    }
+
     Rosbag2Topic get_next_topic(Rosbag2CppReaderImpl *reader)
     {
         auto msg = reader->impl.read_next();
-        return Rosbag2Topic{.topic_name = msg->topic_name.c_str(), .topic_buffer_size = msg->serialized_data->buffer_length, .topic_buffer = msg->serialized_data->buffer};
+        return Rosbag2Topic{.topic_name = msg->topic_name.c_str(), .time_stamp = msg->time_stamp, .topic_buffer_size = msg->serialized_data->buffer_length, .topic_buffer = msg->serialized_data->buffer};
     }
 
     bool has_next_topic(Rosbag2CppReaderImpl *reader)
