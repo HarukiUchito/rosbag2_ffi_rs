@@ -44,6 +44,8 @@ pub struct Rosbag2Reader {
     name_to_info_map: HashMap<String, RosTopicInfo>,
 }
 
+unsafe impl Send for Rosbag2Reader {}
+
 impl Rosbag2Reader {
     pub fn new(filepath: &str) -> Self {
         let ptr = unsafe { create_bag_reader() };
