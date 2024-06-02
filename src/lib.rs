@@ -126,7 +126,7 @@ impl Rosbag2Reader {
     pub fn geometry_msgs_pose_2d_topic(
         &self,
         topic_name: &str,
-    ) -> Vec<r2r::geometry_msgs::msg::Pose2D> {
+    ) -> Vec<(f64, r2r::geometry_msgs::msg::Pose2D)> {
         let mut ret = Vec::new();
         while unsafe { has_next_topic(self.impl_ptr) } {
             let next_topic = loop {
@@ -175,7 +175,7 @@ impl Rosbag2Reader {
                     _ => panic!("not supported type {}", topic_name),
                 };
                 if let Ok(msg) = msg {
-                    ret.push(msg);
+                    ret.push((next_topic.time_stamp as f64 * 1e-9, msg));
                 }
             }
         }
