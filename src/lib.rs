@@ -124,6 +124,10 @@ impl Rosbag2Reader {
     }
 
     pub fn parse_topic<T: WrappedTypesupport>(&self, topic_name: &str) -> Vec<(f64, T)> {
+        unsafe {
+            seek_bag_reader(self.impl_ptr, 0);
+        }
+
         let topic_type_specified = std::any::type_name::<T>()
             .split("::")
             .collect::<Vec<&str>>()
