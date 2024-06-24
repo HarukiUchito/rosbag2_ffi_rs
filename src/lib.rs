@@ -123,10 +123,14 @@ impl Rosbag2Reader {
         println!("{:?}", msg);
     }
 
-    pub fn geometry_msgs_pose_2d_topic(
-        &self,
-        topic_name: &str,
-    ) -> Vec<(f64, r2r::geometry_msgs::msg::Pose2D)> {
+    pub fn parse_topic<T: WrappedTypesupport>(&self, topic_name: &str) -> Vec<(f64, T)> {
+        let topic_type_specified = std::any::type_name::<T>()
+            .split("::")
+            .collect::<Vec<&str>>()
+            .drain(3..)
+            .collect::<Vec<&str>>()
+            .join("/");
+        println!("topic type: {}", topic_type_specified);
         let mut ret = Vec::new();
         while unsafe { has_next_topic(self.impl_ptr) } {
             let next_topic = loop {
@@ -143,7 +147,7 @@ impl Rosbag2Reader {
                     .unwrap()
                     .topic_type
                     .as_str()
-                    == "geometry_msgs/msg/Pose2D"
+                    == topic_type_specified.as_str()
                 {
                     break Some(cand);
                 }
@@ -168,11 +172,10 @@ impl Rosbag2Reader {
                     .unwrap()
                     .topic_type
                     .clone();
-                let msg = match topic_type.as_str() {
-                    "geometry_msgs/msg/Pose2D" => {
-                        r2r::geometry_msgs::msg::Pose2D::from_serialized_bytes(topic_data)
-                    }
-                    _ => panic!("not supported type {}", topic_name),
+                let msg = if topic_type.as_str() == topic_type_specified.as_str() {
+                    T::from_serialized_bytes(topic_data)
+                } else {
+                    panic!("not supported type {}", topic_name)
                 };
                 if let Ok(msg) = msg {
                     ret.push((next_topic.time_stamp as f64 * 1e-9, msg));

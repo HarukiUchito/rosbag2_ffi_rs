@@ -13,7 +13,7 @@ fn main() {
     let reader = rosbag2_ffi_rs::Rosbag2Reader::new(args.filepath.as_str());
     println!("{}", reader);
 
-    let topics = reader.geometry_msgs_pose_2d_topic("/MachinePose2D");
+    let topics = reader.parse_topic::<r2r::geometry_msgs::msg::Pose2D>("/MachinePose2D");
     println!("{:?}", topics);
     println!("topic number: {:?}", topics.len());
 }
