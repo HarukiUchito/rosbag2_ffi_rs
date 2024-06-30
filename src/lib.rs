@@ -79,11 +79,15 @@ impl Rosbag2Reader {
                 break;
             }
             let cand = unsafe { get_next_topic(ptr) };
-            let topic_name = unsafe { std::ffi::CStr::from_ptr(cand.topic_name) }
-                .to_str()
-                .unwrap();
-            if let Some(info) = name_to_info_map.get_mut(&topic_name.to_string()) {
-                info.topic_count += 1;
+            //println!("{:?}", cand);
+            let topic_name = unsafe { std::ffi::CStr::from_ptr(cand.topic_name) };
+
+            //println!("{:?}", topic_name.to_bytes());
+            //println!("{:?}", topic_name.to_str());
+            if let Ok(topic_name) = topic_name.to_str() {
+                if let Some(info) = name_to_info_map.get_mut(&topic_name.to_string()) {
+                    info.topic_count += 1;
+                }
             }
         }
         unsafe {
@@ -128,6 +132,8 @@ impl Rosbag2Reader {
             seek_bag_reader(self.impl_ptr, 0);
         }
 
+        // remove prefix like
+        // r2r::msg_types::generated_msgs::std_msgs::msg::UInt8 -> std_msgs/msg/UInt8
         let topic_type_specified = std::any::type_name::<T>()
             .split("::")
             .collect::<Vec<&str>>()
@@ -135,6 +141,7 @@ impl Rosbag2Reader {
             .collect::<Vec<&str>>()
             .join("/");
         println!("topic type: {}", topic_type_specified);
+
         let mut ret = Vec::new();
         while unsafe { has_next_topic(self.impl_ptr) } {
             let next_topic = loop {

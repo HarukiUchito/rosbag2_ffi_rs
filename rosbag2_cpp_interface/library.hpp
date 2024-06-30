@@ -6,6 +6,7 @@ typedef struct
 {
     rosbag2_cpp::Reader impl;
     std::vector<rosbag2_storage::TopicMetadata> metadata;
+    rosbag2_storage::SerializedBagMessageSharedPtr current_msg;
 } Rosbag2CppReaderImpl;
 
 typedef struct

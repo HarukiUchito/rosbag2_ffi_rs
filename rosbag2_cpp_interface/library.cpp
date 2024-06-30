@@ -1,4 +1,5 @@
 #include "library.hpp"
+#include <limits.h>
 #include <iostream>
 
 #ifdef __cplusplus
@@ -41,8 +42,8 @@ extern "C"
 
     Rosbag2Topic get_next_topic(Rosbag2CppReaderImpl *reader)
     {
-        auto msg = reader->impl.read_next();
-        return Rosbag2Topic{.topic_name = msg->topic_name.c_str(), .time_stamp = msg->time_stamp, .topic_buffer_size = msg->serialized_data->buffer_length, .topic_buffer = msg->serialized_data->buffer};
+        reader->current_msg = reader->impl.read_next();
+        return Rosbag2Topic{.topic_name = reinterpret_cast<const char *>(reader->current_msg->topic_name.c_str()), .time_stamp = reader->current_msg->time_stamp, .topic_buffer_size = reader->current_msg->serialized_data->buffer_length, .topic_buffer = reader->current_msg->serialized_data->buffer};
     }
 
     bool has_next_topic(Rosbag2CppReaderImpl *reader)
